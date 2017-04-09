@@ -35,31 +35,33 @@ class Game(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.hud.draw()
         glEnable(GL_LIGHTING)
-        for a in self.asteroids:
-            a.draw()
-        self.ship.draw()
-        particle.draw()
-        for enemy in self.enemies:
-            enemy.draw()
-        glFlush()
+        if self.level < 6 and self.ship.lives > 0:
+            for a in self.asteroids:
+                a.draw()
+            self.ship.draw()
+            particle.draw()
+            for enemy in self.enemies:
+                enemy.draw()
+            glFlush()
         glutSwapBuffers()
 
     def update(self, value):
-        glutTimerFunc(20, self.update, 0)
-        for a in self.asteroids:
-            a.update()
-        for enemy in self.enemies:
-            enemy.update()
-        self.ship.update()
-        self.collision()
-        particle.update()
-        self.game_update()
-        self._level_frame += 1
-        if self._level_frame % 500 == 0:
-            newalien = levels.level[self.level].enter_alien(self.ship)
-            if newalien:
-                self.enemies.add(newalien)
-        glutPostRedisplay()
+        if self.level<6 and self.ship.lives>0:
+            glutTimerFunc(20, self.update, 0)
+            for a in self.asteroids:
+                a.update()
+            for enemy in self.enemies:
+                enemy.update()
+            self.ship.update()
+            self.collision()
+            particle.update()
+            self.game_update()
+            self._level_frame += 1
+            if self._level_frame % 500 == 0:
+                newalien = levels.level[self.level].enter_alien(self.ship)
+                if newalien:
+                    self.enemies.add(newalien)
+            glutPostRedisplay()
 
     def keypress(self, key, x, y):
         try:{
@@ -138,7 +140,7 @@ class Game(object):
             pass
 
     def _update_ship_next_level(self):
-        if self.ship.lives>-1:
+        if self.ship.lives>-1 and self.level<6:
             if self.ship.is_flying():
                 self._t = 0
             else:
@@ -147,14 +149,15 @@ class Game(object):
                 self.level += 1
                 self._level_frame = 0
                 self.hud.set_level(self.level)
-                self.asteroids.update( levels.level[self.level].create_asteroids() )
+                if self.level<6:
+                    self.asteroids.update( levels.level[self.level].create_asteroids() )
                 if self.ship.is_dead():
                     self.ship.new_ship()
                 self.ship.fly_in()
                 self._update_func = self._update_during_level
 
     def _update_respawn(self):
-        if self.ship.lives > -1:
+        if self.ship.lives > -1 and self.level < 6:
             self._t += 1
             if self._t > 100:
                 self.ship.new_ship()
