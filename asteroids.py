@@ -35,7 +35,7 @@ class Game(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.hud.draw()
         glEnable(GL_LIGHTING)
-        if self.level < 6 and self.ship.lives > 0:
+        if self.level < 6 and self.ship.lives > -1:
             for a in self.asteroids:
                 a.draw()
             self.ship.draw()
@@ -46,7 +46,7 @@ class Game(object):
         glutSwapBuffers()
 
     def update(self, value):
-        if self.level<6 and self.ship.lives>0:
+        if self.level<6 and self.ship.lives> -1:
             glutTimerFunc(20, self.update, 0)
             for a in self.asteroids:
                 a.update()
